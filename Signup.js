@@ -47,6 +47,30 @@ app.post('/backend/signupData',async(req,res)=>{
     }
 })
 
+//Login api
+
+app.post('/backend/loginData', async(req,res)=>{
+    try{
+        const {email,password}=req.body;
+        if(!email || !password){
+            return res.status(400).json({message:'Email and password is required'})
+        }
+        // Find the signup email
+        const exitinguser = await signup.findOne({email});
+        if(!exitinguser){
+            return res.status(400).json({message:'Invalid email or password'});
+        }
+        //data match
+        if(exitinguser.password != password){
+            return res.status(400).json({message:'Invalid password'});
+        }
+        res.status(200).json({message:'Login successfull',user:exitinguser});
+    }
+    catch(err){
+        console.error('Eroor during LognIn', err);;
+        res.status(500).json({message:'Error during login'})
+    }
+})
 
 app.listen(3000,()=>{
     console.log("Server is running on port 3000 ")
