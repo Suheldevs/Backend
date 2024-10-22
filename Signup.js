@@ -34,11 +34,11 @@ const signup = mongoose.model('signupData',signupSchema);
 
 //post handling
 
-app.post('/backend/signupData',(req,res)=>{
+app.post('/backend/signupData',async(req,res)=>{
     try{
         const {userName,email,password}=req.body;
         const newSingup = new signup({userName,email,password});
-        newSingup.save();
+        await newSingup.save();
         res.status(201).json({message:'sing up successfull',signup:newSingup})
     }
     catch(err){
