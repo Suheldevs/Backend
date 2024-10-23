@@ -27,7 +27,27 @@ const signupSchema =new mongoose.Schema({
     password:{
         type:String,
         required:true,
+    },
+    gender:{
+        type:String,
+        required:true,
+    },
+    status:{
+        type:String,
+        required:true,
+    },
+    hobbies:{
+        type:[String],
+    },
+    skills:{
+        technical:{
+            type:[String]
+        },
+        tools:{
+            type:[String]
+        }
     }
+    
 })
 
 const signup = mongoose.model('signupData',signupSchema);
@@ -36,8 +56,8 @@ const signup = mongoose.model('signupData',signupSchema);
 
 app.post('/backend/signupData',async(req,res)=>{
     try{
-        const {userName,email,password}=req.body;
-        const newSingup = new signup({userName,email,password});
+        const {userName,email,password,gender,status,hobbies,skills}=req.body;
+        const newSingup = new signup({userName,email,password,gender,status,hobbies:hobbies|| [],skills:skills || {}});
         await newSingup.save();
         res.status(201).json({message:'sing up successfull',signup:newSingup})
     }
@@ -71,6 +91,34 @@ app.post('/backend/loginData', async(req,res)=>{
         res.status(500).json({message:'Error during login'})
     }
 })
+
+//delete data from data base.
+app.delete('/backend/delete/:id', async(req,res)=>{
+    try{
+    const {id}=req.params;
+    //find user by id
+    const deletedUser =  await signup.findByIdAndDelete(id);
+    if(!deletedUser){
+        return res.status(400).json({meassage:'User Not Found'});
+    }
+    res.status(200).json({message:'User deleted successfully',user:deletedUser});
+}
+catch(err){
+    res.status(500).json({message:'Error deleting user'})
+}
+})
+
+
+//find data by any common feild 
+
+app.get('/backend/find', async(req,res)=>{
+    const findData = await signup.find({status:"Active"})
+    if(!findData){
+        return res.status(400).json({message:'Not font any data'})
+    }
+    res.status(200).json({message:'User find',user:findData})
+ })
+
 
 app.listen(3000,()=>{
     console.log("Server is running on port 3000 ")
